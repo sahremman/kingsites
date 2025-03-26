@@ -1,147 +1,40 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Classroom Management</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-    <nav>
-        <ul>
-            <li><a href="index.html">Dashboard</a></li>
-            <li><a href="classes.html">Classes</a></li>
-            <li><a href="students.html">Students</a></li>
-            <li><a href="quizzes.html">Quizzes</a></li>
-            <li><a href="results.html">Results</a></li>
-        </ul>
-    </nav>
-    
-    <main>
-        <h1>Welcome to Classroom Management</h1>
-        <p>Select an option from the navigation menu.</p>
-    </main>
-</body>
-</html>
+/* styles.css - General Styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+nav ul {
+    list-style: none;
+    padding: 0;
+    background: #333;
+    overflow: hidden;
+    display: flex;
+}
+nav ul li {
+    padding: 14px 20px;
+}
+nav ul li a {
+    color: white;
+    text-decoration: none;
+}
 
-<!-- students.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Students</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-    <nav>
-        <ul>
-            <li><a href="index.html">Dashboard</a></li>
-            <li><a href="classes.html">Classes</a></li>
-            <li><a href="students.html">Students</a></li>
-            <li><a href="quizzes.html">Quizzes</a></li>
-            <li><a href="results.html">Results</a></li>
-        </ul>
-    </nav>
-    <main>
-        <h1>Manage Students</h1>
-        <form id="add-student-form">
-            <input type="text" id="student-name" placeholder="Student Name" required>
-            <input type="text" id="student-class" placeholder="Class" required>
-            <input type="email" id="student-email" placeholder="Email" required>
-            <button type="submit">Add Student</button>
-        </form>
-        <table>
-            <tr>
-                <th>Name</th>
-                <th>Class</th>
-                <th>Email</th>
-                <th>Actions</th>
-            </tr>
-            <tbody id="student-list"></tbody>
-        </table>
-    </main>
-    <script src="script.js"></script>
-</body>
-</html>
+/* students.css - Styles specific to students page */
+#add-student-form {
+    margin-bottom: 20px;
+}
 
-<!-- quizzes.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Quizzes</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-    <nav>
-        <ul>
-            <li><a href="index.html">Dashboard</a></li>
-            <li><a href="classes.html">Classes</a></li>
-            <li><a href="students.html">Students</a></li>
-            <li><a href="quizzes.html">Quizzes</a></li>
-            <li><a href="results.html">Results</a></li>
-        </ul>
-    </nav>
-    <main>
-        <h1>Manage Quizzes</h1>
-        <form id="add-quiz-form">
-            <input type="text" id="quiz-title" placeholder="Quiz Title" required>
-            <textarea id="quiz-questions" placeholder="Enter questions (one per line)" required></textarea>
-            <input type="number" id="quiz-time" placeholder="Time Limit (mins)" required>
-            <button type="submit">Add Quiz</button>
-        </form>
-        <table>
-            <tr>
-                <th>Title</th>
-                <th>Time Limit</th>
-                <th>Actions</th>
-            </tr>
-            <tbody id="quiz-list"></tbody>
-        </table>
-    </main>
-    <script src="script.js"></script>
-</body>
-</html>
+/* quizzes.css - Styles specific to quizzes page */
+#add-quiz-form {
+    margin-bottom: 20px;
+}
 
-<!-- results.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz Results</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-    <nav>
-        <ul>
-            <li><a href="index.html">Dashboard</a></li>
-            <li><a href="classes.html">Classes</a></li>
-            <li><a href="students.html">Students</a></li>
-            <li><a href="quizzes.html">Quizzes</a></li>
-            <li><a href="results.html">Results</a></li>
-        </ul>
-    </nav>
-    <main>
-        <h1>Quiz Results</h1>
-        <table>
-            <tr>
-                <th>Student Name</th>
-                <th>Quiz Title</th>
-                <th>Score</th>
-                <th>Actions</th>
-            </tr>
-            <tbody id="results-list"></tbody>
-        </table>
-        <button onclick="exportToCSV()">Download CSV</button>
-    </main>
-    <script src="script.js"></script>
-</body>
-</html>
+/* results.css - Styles specific to results page */
+button {
+    margin-top: 10px;
+}
 
-<!-- Updated script.js for new functionalities -->
+// script_students.js - Student Page Functionality
 document.getElementById("add-student-form").addEventListener("submit", function(event) {
     event.preventDefault();
     const name = document.getElementById("student-name").value;
@@ -157,6 +50,23 @@ function deleteStudent(button) {
     button.parentElement.parentElement.remove();
 }
 
+// script_quizzes.js - Quizzes Page Functionality
+document.getElementById("add-quiz-form").addEventListener("submit", function(event) {
+    event.preventDefault();
+    const title = document.getElementById("quiz-title").value;
+    const questions = document.getElementById("quiz-questions").value;
+    const time = document.getElementById("quiz-time").value;
+    const quizList = document.getElementById("quiz-list");
+    const newRow = document.createElement("tr");
+    newRow.innerHTML = `<td>${title}</td><td>${time} mins</td><td><button onclick="deleteQuiz(this)">Delete</button></td>`;
+    quizList.appendChild(newRow);
+});
+
+function deleteQuiz(button) {
+    button.parentElement.parentElement.remove();
+}
+
+// script_results.js - Results Page Functionality
 function exportToCSV() {
     alert("Export to CSV functionality to be implemented.");
 }
