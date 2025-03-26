@@ -5,17 +5,54 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Classroom Management System</title>
     <style>
-        /* Previous CSS remains the same */
-        .action-buttons {
-            display: flex;
-            gap: 10px;
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            background-color: #f4f4f4;
         }
-        .clear-data-btn {
-            background-color: #ff4444;
+        .container {
+            width: 80%;
+            margin: auto;
+            overflow: hidden;
+            padding: 20px;
+        }
+        .navbar {
+            background-color: #333;
             color: white;
-            border: none;
-            padding: 5px 10px;
-            cursor: pointer;
+            padding: 10px 0;
+            text-align: center;
+        }
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            padding: 10px;
+        }
+        .content {
+            background-color: white;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        .hidden {
+            display: none;
         }
     </style>
 </head>
@@ -29,9 +66,7 @@
     </div>
 
     <div class="container">
-        <!-- Previous HTML content remains the same -->
-        
-        <!-- Add Clear Data Button to Dashboard -->
+        <!-- Dashboard Section -->
         <div id="dashboard" class="content">
             <h1>Dashboard</h1>
             <div id="dashboardStats">
@@ -39,89 +74,180 @@
                 <p>Total Students: <span id="totalStudents">0</span></p>
                 <p>Total Quizzes: <span id="totalQuizzes">0</span></p>
             </div>
-            <button onclick="clearAllData()" class="clear-data-btn">Clear All Data</button>
+        </div>
+
+        <!-- Classrooms Section -->
+        <div id="classrooms" class="content hidden">
+            <h1>Classroom Management</h1>
+            <form id="classroomForm">
+                <div class="form-group">
+                    <label>Classroom Name</label>
+                    <input type="text" id="classroomName" required>
+                </div>
+                <div class="form-group">
+                    <label>Subject</label>
+                    <input type="text" id="classroomSubject" required>
+                </div>
+                <button type="submit">Add Classroom</button>
+            </form>
+
+            <h2>Classroom List</h2>
+            <table id="classroomTable">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Subject</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="classroomList"></tbody>
+            </table>
+        </div>
+
+        <!-- Students Section -->
+        <div id="students" class="content hidden">
+            <h1>Student Management</h1>
+            <form id="studentForm">
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" id="studentName" required>
+                </div>
+                <div class="form-group">
+                    <label>Classroom</label>
+                    <select id="studentClassroom" required></select>
+                </div>
+                <button type="submit">Add Student</button>
+            </form>
+
+            <h2>Student List</h2>
+            <table id="studentTable">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Classroom</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="studentList"></tbody>
+            </table>
+        </div>
+
+        <!-- Quizzes Section -->
+        <div id="quizzes" class="content hidden">
+            <h1>Quiz Creator</h1>
+            <form id="quizForm">
+                <div class="form-group">
+                    <label>Quiz Title</label>
+                    <input type="text" id="quizTitle" required>
+                </div>
+                <div class="form-group">
+                    <label>Classroom</label>
+                    <select id="quizClassroom" required></select>
+                </div>
+                <div class="form-group">
+                    <label>Time Limit (minutes)</label>
+                    <input type="number" id="quizTimeLimit">
+                </div>
+                <button type="submit">Create Quiz</button>
+            </form>
+
+            <h2>Quiz List</h2>
+            <table id="quizTable">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Classroom</th>
+                        <th>Time Limit</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="quizList"></tbody>
+            </table>
+        </div>
+
+        <!-- Grades Section -->
+        <div id="grades" class="content hidden">
+            <h1>Grades Management</h1>
+            <form id="gradeForm">
+                <div class="form-group">
+                    <label>Student</label>
+                    <select id="gradeStudent" required></select>
+                </div>
+                <div class="form-group">
+                    <label>Quiz</label>
+                    <select id="gradeQuiz" required></select>
+                </div>
+                <div class="form-group">
+                    <label>Score</label>
+                    <input type="number" id="gradeScore" required>
+                </div>
+                <button type="submit">Record Grade</button>
+            </form>
+
+            <h2>Grade Report</h2>
+            <table id="gradeTable">
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Quiz</th>
+                        <th>Score</th>
+                    </tr>
+                </thead>
+                <tbody id="gradeList"></tbody>
+            </table>
         </div>
     </div>
 
     <script>
-        // Local Storage Utility Functions
-        function saveToLocalStorage(key, data) {
-            try {
-                localStorage.setItem(key, JSON.stringify(data));
-            } catch (error) {
-                console.error('Error saving to local storage:', error);
-                if (error instanceof DOMException && error.name === 'QuotaExceededError') {
-                    alert('Local storage is full. Please clear some data.');
-                }
-            }
-        }
+        // Global storage with localStorage support
+        let classrooms = [];
+        let students = [];
+        let quizzes = [];
+        let grades = [];
 
-        function loadFromLocalStorage(key, defaultValue = []) {
-            try {
-                const data = localStorage.getItem(key);
-                return data ? JSON.parse(data) : defaultValue;
-            } catch (error) {
-                console.error('Error loading from local storage:', error);
-                return defaultValue;
-            }
-        }
+        // Load data from localStorage on page load
+        function loadDataFromLocalStorage() {
+            classrooms = JSON.parse(localStorage.getItem('classrooms')) || [];
+            students = JSON.parse(localStorage.getItem('students')) || [];
+            quizzes = JSON.parse(localStorage.getItem('quizzes')) || [];
+            grades = JSON.parse(localStorage.getItem('grades')) || [];
 
-        // Clear All Data Function
-        function clearAllData() {
-            const confirmClear = confirm('Are you sure you want to clear ALL data? This cannot be undone.');
-            if (confirmClear) {
-                localStorage.clear();
-                // Reset global arrays
-                classrooms = [];
-                students = [];
-                quizzes = [];
-                grades = [];
-
-                // Re-render all lists
-                renderClassrooms();
-                renderStudents();
-                renderQuizzes();
-                renderGrades();
-                updateDashboard();
-
-                alert('All data has been cleared.');
-            }
-        }
-
-        // Global storage with local storage initialization
-        let classrooms = loadFromLocalStorage('classrooms');
-        let students = loadFromLocalStorage('students');
-        let quizzes = loadFromLocalStorage('quizzes');
-        let grades = loadFromLocalStorage('grades');
-
-        // Modify existing functions to use local storage
-        // Classroom Management
-        function renderClassrooms() {
-            const list = document.getElementById('classroomList');
-            list.innerHTML = '';
-            
-            classrooms.forEach(classroom => {
-                const row = list.insertRow();
-                row.innerHTML = `
-                    <td>${classroom.name}</td>
-                    <td>${classroom.subject}</td>
-                    <td class="action-buttons">
-                        <button onclick="deleteClassroom(${classroom.id})">Delete</button>
-                    </td>
-                `;
-            });
-            
-            // Persist to local storage
-            saveToLocalStorage('classrooms', classrooms);
-        }
-
-        function deleteClassroom(id) {
-            classrooms = classrooms.filter(c => c.id !== id);
+            // Render all data
             renderClassrooms();
+            renderStudents();
+            renderQuizzes();
+            renderGrades();
             updateDashboard();
         }
 
-        // Existing form submit handler for classrooms
+        // Save data to localStorage
+        function saveToLocalStorage() {
+            localStorage.setItem('classrooms', JSON.stringify(classrooms));
+            localStorage.setItem('students', JSON.stringify(students));
+            localStorage.setItem('quizzes', JSON.stringify(quizzes));
+            localStorage.setItem('grades', JSON.stringify(grades));
+        }
+
+        // Show/Hide Sections
+        function showSection(sectionId) {
+            // Hide all sections
+            ['dashboard', 'classrooms', 'students', 'quizzes', 'grades'].forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.remove('hidden');
+            
+            // Update dropdowns when switching sections
+            if (sectionId === 'students') updateClassroomDropdown();
+            if (sectionId === 'quizzes') updateClassroomDropdown();
+            if (sectionId === 'grades') {
+                updateStudentDropdown();
+                updateQuizDropdown();
+            }
+        }
+
+        // Classroom Management
         document.getElementById('classroomForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const name = document.getElementById('classroomName').value;
@@ -132,13 +258,75 @@
             
             renderClassrooms();
             updateDashboard();
+            saveToLocalStorage();
             
             // Clear form
             document.getElementById('classroomName').value = '';
             document.getElementById('classroomSubject').value = '';
         });
 
-        // Similar modifications for other sections (students, quizzes, grades)
+        function renderClassrooms() {
+            const list = document.getElementById('classroomList');
+            list.innerHTML = '';
+            
+            classrooms.forEach(classroom => {
+                const row = list.insertRow();
+                row.innerHTML = `
+                    <td>${classroom.name}</td>
+                    <td>${classroom.subject}</td>
+                    <td>
+                        <button onclick="deleteClassroom(${classroom.id})">Delete</button>
+                    </td>
+                `;
+            });
+        }
+
+        function deleteClassroom(id) {
+            classrooms = classrooms.filter(c => c.id !== id);
+            renderClassrooms();
+            updateDashboard();
+            saveToLocalStorage();
+        }
+
+        // Student Management
+        function updateClassroomDropdown() {
+            const dropdowns = [
+                document.getElementById('studentClassroom'),
+                document.getElementById('quizClassroom')
+            ];
+            
+            dropdowns.forEach(dropdown => {
+                dropdown.innerHTML = '<option value="">Select Classroom</option>';
+                classrooms.forEach(classroom => {
+                    const option = document.createElement('option');
+                    option.value = classroom.id;
+                    option.textContent = classroom.name;
+                    dropdown.appendChild(option);
+                });
+            });
+        }
+
+        document.getElementById('studentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('studentName').value;
+            const classroomId = document.getElementById('studentClassroom').value;
+            
+            const student = { 
+                id: Date.now(), 
+                name, 
+                classroomId 
+            };
+            students.push(student);
+            
+            renderStudents();
+            updateDashboard();
+            saveToLocalStorage();
+            
+            // Clear form
+            document.getElementById('studentName').value = '';
+            document.getElementById('studentClassroom').value = '';
+        });
+
         function renderStudents() {
             const list = document.getElementById('studentList');
             list.innerHTML = '';
@@ -149,21 +337,44 @@
                 row.innerHTML = `
                     <td>${student.name}</td>
                     <td>${classroom ? classroom.name : 'Unassigned'}</td>
-                    <td class="action-buttons">
+                    <td>
                         <button onclick="deleteStudent(${student.id})">Delete</button>
                     </td>
                 `;
             });
-            
-            // Persist to local storage
-            saveToLocalStorage('students', students);
         }
 
         function deleteStudent(id) {
             students = students.filter(s => s.id !== id);
             renderStudents();
             updateDashboard();
+            saveToLocalStorage();
         }
+
+        // Quiz Management
+        document.getElementById('quizForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const title = document.getElementById('quizTitle').value;
+            const classroomId = document.getElementById('quizClassroom').value;
+            const timeLimit = document.getElementById('quizTimeLimit').value;
+            
+            const quiz = { 
+                id: Date.now(), 
+                title, 
+                classroomId,
+                timeLimit: timeLimit || 'No Limit'
+            };
+            quizzes.push(quiz);
+            
+            renderQuizzes();
+            updateDashboard();
+            saveToLocalStorage();
+            
+            // Clear form
+            document.getElementById('quizTitle').value = '';
+            document.getElementById('quizClassroom').value = '';
+            document.getElementById('quizTimeLimit').value = '';
+        });
 
         function renderQuizzes() {
             const list = document.getElementById('quizList');
@@ -176,21 +387,65 @@
                     <td>${quiz.title}</td>
                     <td>${classroom ? classroom.name : 'Unassigned'}</td>
                     <td>${quiz.timeLimit}</td>
-                    <td class="action-buttons">
+                    <td>
                         <button onclick="deleteQuiz(${quiz.id})">Delete</button>
                     </td>
                 `;
             });
-            
-            // Persist to local storage
-            saveToLocalStorage('quizzes', quizzes);
         }
 
         function deleteQuiz(id) {
             quizzes = quizzes.filter(q => q.id !== id);
             renderQuizzes();
             updateDashboard();
+            saveToLocalStorage();
         }
+
+        // Grade Management
+        function updateStudentDropdown() {
+            const dropdown = document.getElementById('gradeStudent');
+            dropdown.innerHTML = '<option value="">Select Student</option>';
+            students.forEach(student => {
+                const option = document.createElement('option');
+                option.value = student.id;
+                option.textContent = student.name;
+                dropdown.appendChild(option);
+            });
+        }
+
+        function updateQuizDropdown() {
+            const dropdown = document.getElementById('gradeQuiz');
+            dropdown.innerHTML = '<option value="">Select Quiz</option>';
+            quizzes.forEach(quiz => {
+                const option = document.createElement('option');
+                option.value = quiz.id;
+                option.textContent = quiz.title;
+                dropdown.appendChild(option);
+            });
+        }
+
+        document.getElementById('gradeForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const studentId = document.getElementById('gradeStudent').value;
+            const quizId = document.getElementById('gradeQuiz').value;
+            const score = document.getElementById('gradeScore').value;
+            
+            const grade = { 
+                id: Date.now(), 
+                studentId, 
+                quizId, 
+                score 
+            };
+            grades.push(grade);
+            
+            renderGrades();
+            saveToLocalStorage();
+            
+            // Clear form
+            document.getElementById('gradeStudent').value = '';
+            document.getElementById('gradeQuiz').value = '';
+            document.getElementById('gradeScore').value = '';
+        });
 
         function renderGrades() {
             const list = document.getElementById('gradeList');
@@ -207,23 +462,18 @@
                     <td>${grade.score}</td>
                 `;
             });
-            
-            // Persist to local storage
-            saveToLocalStorage('grades', grades);
         }
 
-        // Existing form submit handlers for students, quizzes, and grades 
-        // will need similar local storage persistence (add saveToLocalStorage calls)
+        // Dashboard Update
+        function updateDashboard() {
+            document.getElementById('totalClassrooms').textContent = classrooms.length;
+            document.getElementById('totalStudents').textContent = students.length;
+            document.getElementById('totalQuizzes').textContent = quizzes.length;
+        }
 
-        // Remaining existing script remains the same
-        // ... (previous script content)
-
-        // Initial render and dashboard update
-        renderClassrooms();
-        renderStudents();
-        renderQuizzes();
-        renderGrades();
-        updateDashboard();
+        // Initial setup
+        document.addEventListener('DOMContentLoaded', loadDataFromLocalStorage);
+        showSection('dashboard');
     </script>
 </body>
 </html>
