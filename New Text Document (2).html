@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClassHub - Classroom Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+
+    <script type="text/babel">
+        // Main App Component
+        const App = () => {
+            const [page, setPage] = React.useState('dashboard');
+            const [classes, setClasses] = React.useState([
+                { id: 1, name: 'Environmental Soil Chemistry', students: [] },
+                { id: 2, name: 'Sustainable Development', students: [] }
+            ]);
+            const [selectedClass, setSelectedClass] = React.useState(null);
+
+            const Navigation = () => (
+                <nav className="bg-green-600 text-white p-4 flex justify-between">
+                    <div className="flex space-x-4">
+                        <button onClick={() => setPage('dashboard')} className="hover:bg-green-700 px-3 py-2 rounded">Dashboard</button>
+                        <button onClick={() => setPage('classes')} className="hover:bg-green-700 px-3 py-2 rounded">My Classes</button>
+                        <button onClick={() => setPage('students')} className="hover:bg-green-700 px-3 py-2 rounded">Students</button>
+                        <button onClick={() => setPage('assignments')} className="hover:bg-green-700 px-3 py-2 rounded">Assignments</button>
+                        <button onClick={() => setPage('profile')} className="hover:bg-green-700 px-3 py-2 rounded">Profile</button>
+                    </div>
+                </nav>
+            );
+
+            const Dashboard = () => (
+                <div className="p-6">
+                    <h1 className="text-3xl font-bold mb-4">Dashboard</h1>
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="bg-white shadow rounded p-4">
+                            <h2 className="text-xl font-semibold">Total Classes</h2>
+                            <p className="text-3xl">{classes.length}</p>
+                        </div>
+                        <div className="bg-white shadow rounded p-4">
+                            <h2 className="text-xl font-semibold">Total Students</h2>
+                            <p className="text-3xl">{classes.reduce((total, cls) => total + cls.students.length, 0)}</p>
+                        </div>
+                    </div>
+                </div>
+            );
+
+            const ClassList = () => {
+                const [newClassName, setNewClassName] = React.useState('');
+
+                const addClass = () => {
+                    if (newClassName.trim()) {
+                        setClasses([...classes, { 
+                            id: classes.length + 1, 
+                            name: newClassName, 
+                            students: [] 
+                        }]);
+                        setNewClassName('');
+                    }
+                };
+
+                return (
+                    <div className="p-6">
+                        <h1 className="text-3xl font-bold mb-4">My Classes</h1>
+                        <div className="flex mb-4">
+                            <input 
+                                type="text" 
+                                value={newClassName}
+                                onChange={(e) => setNewClassName(e.target.value)}
+                                placeholder="Enter new class name" 
+                                className="border p-2 mr-2 flex-grow"
+                            />
+                            <button 
+                                onClick={addClass} 
+                                className="bg-green-600 text-white px-4 py-2 rounded"
+                            >
+                                Add Class
+                            </button>
+                        </div>
+                        <div className="grid gap-4">
+                            {classes.map(cls => (
+                                <div key={cls.id} className="bg-white shadow rounded p-4 flex justify-between items-center">
+                                    <div>
+                                        <h2 className="text-xl font-semibold">{cls.name}</h2>
+                                        <p>{cls.students.length} students</p>
+                                    </div>
+                                    <button 
+                                        onClick={() => {
+                                            setSelectedClass(cls);
+                                            setPage('classDetails');
+                                        }} 
+                                        className="bg-blue-500 text-white px-3 py-2 rounded"
+                                    >
+                                        Manage
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                );
+            };
+
+            const ClassDetails = () => {
+                const [studentName, setStudentName] = React.useState('');
+                const [studentEmail, setStudentEmail] = React.useState('');
+
+                const addStudent = () => {
+                    if (studentName.trim() && studentEmail.trim()) {
+                        const updatedClasses = classes.map(cls => 
+                            cls.id === selectedClass.id 
+                                ? {...cls, students: [...cls.students, { name: studentName, email: studentEmail }]}
+                                : cls
+                        );
+                        setClasses(updatedClasses);
+                        setStudentName('');
+                        setStudentEmail('');
+                    }
+                };
+
+                return (
+                    <div className="p-6">
+                        <h1 className="text-3xl font-bold mb-4">{selectedClass.name}</h1>
+                        <div className="grid md:grid-cols-2 gap-4">
+                            <div>
+                                <h2 className="text-xl font-semibold mb-2">Add Student</h2>
+                                <input 
+                                    type="text" 
+                                    value={studentName}
+                                    onChange={(e) => setStudentName(e.target.value)}
+                                    placeholder="Student Name" 
+                                    className="border p-2 w-full mb-2"
+                                />
+                                <input 
+                                    type="email" 
+                                    value={studentEmail}
+                                    onChange={(e) => setStudentEmail(e.target.value)}
+                                    placeholder="Student Email" 
+                                    className="border p-2 w-full mb-2"
+                                />
+                                <button 
+                                    onClick={addStudent} 
+                                    className="bg-green-600 text-white px-4 py-2 rounded w-full"
+                                >
+                                    Add Student
+                                </button>
+                            </div>
+                            <div>
+                                <h2 className="text-xl font-semibold mb-2">Students</h2>
+                                <div className="bg-white shadow rounded p-4">
+                                    {selectedClass.students.map((student, index) => (
+                                        <div key={index} className="border-b last:border-b-0 py-2">
+                                            <p className="font-medium">{student.name}</p>
+                                            <p className="text-gray-600">{student.email}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                );
+            };
+
+            const renderPage = () => {
+                switch(page) {
+                    case 'dashboard': return <Dashboard />;
+                    case 'classes': return <ClassList />;
+                    case 'classDetails': return <ClassDetails />;
+                    default: return <Dashboard />;
+                }
+            };
+
+            return (
+                <div className="bg-gray-100 min-h-screen">
+                    <Navigation />
+                    {renderPage()}
+                </div>
+            );
+        };
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>
