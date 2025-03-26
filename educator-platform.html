@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classroom Management System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            background-color: #f4f4f4;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            overflow: hidden;
+            padding: 20px;
+        }
+        .navbar {
+            background-color: #333;
+            color: white;
+            padding: 10px 0;
+            text-align: center;
+        }
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            padding: 10px;
+        }
+        .content {
+            background-color: white;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <a href="#" onclick="showSection('dashboard')">Dashboard</a>
+        <a href="#" onclick="showSection('classrooms')">Classrooms</a>
+        <a href="#" onclick="showSection('students')">Students</a>
+        <a href="#" onclick="showSection('quizzes')">Quizzes</a>
+        <a href="#" onclick="showSection('grades')">Grades</a>
+    </div>
+
+    <div class="container">
+        <!-- Dashboard Section -->
+        <div id="dashboard" class="content">
+            <h1>Dashboard</h1>
+            <div id="dashboardStats">
+                <p>Total Classrooms: <span id="totalClassrooms">0</span></p>
+                <p>Total Students: <span id="totalStudents">0</span></p>
+                <p>Total Quizzes: <span id="totalQuizzes">0</span></p>
+            </div>
+        </div>
+
+        <!-- Classrooms Section -->
+        <div id="classrooms" class="content hidden">
+            <h1>Classroom Management</h1>
+            <form id="classroomForm">
+                <div class="form-group">
+                    <label>Classroom Name</label>
+                    <input type="text" id="classroomName" required>
+                </div>
+                <div class="form-group">
+                    <label>Subject</label>
+                    <input type="text" id="classroomSubject" required>
+                </div>
+                <button type="submit">Add Classroom</button>
+            </form>
+
+            <h2>Classroom List</h2>
+            <table id="classroomTable">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Subject</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="classroomList"></tbody>
+            </table>
+        </div>
+
+        <!-- Students Section -->
+        <div id="students" class="content hidden">
+            <h1>Student Management</h1>
+            <form id="studentForm">
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" id="studentName" required>
+                </div>
+                <div class="form-group">
+                    <label>Classroom</label>
+                    <select id="studentClassroom" required></select>
+                </div>
+                <button type="submit">Add Student</button>
+            </form>
+
+            <h2>Student List</h2>
+            <table id="studentTable">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Classroom</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="studentList"></tbody>
+            </table>
+        </div>
+
+        <!-- Quizzes Section -->
+        <div id="quizzes" class="content hidden">
+            <h1>Quiz Creator</h1>
+            <form id="quizForm">
+                <div class="form-group">
+                    <label>Quiz Title</label>
+                    <input type="text" id="quizTitle" required>
+                </div>
+                <div class="form-group">
+                    <label>Classroom</label>
+                    <select id="quizClassroom" required></select>
+                </div>
+                <div class="form-group">
+                    <label>Time Limit (minutes)</label>
+                    <input type="number" id="quizTimeLimit">
+                </div>
+                <button type="submit">Create Quiz</button>
+            </form>
+
+            <h2>Quiz List</h2>
+            <table id="quizTable">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Classroom</th>
+                        <th>Time Limit</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="quizList"></tbody>
+            </table>
+        </div>
+
+        <!-- Grades Section -->
+        <div id="grades" class="content hidden">
+            <h1>Grades Management</h1>
+            <form id="gradeForm">
+                <div class="form-group">
+                    <label>Student</label>
+                    <select id="gradeStudent" required></select>
+                </div>
+                <div class="form-group">
+                    <label>Quiz</label>
+                    <select id="gradeQuiz" required></select>
+                </div>
+                <div class="form-group">
+                    <label>Score</label>
+                    <input type="number" id="gradeScore" required>
+                </div>
+                <button type="submit">Record Grade</button>
+            </form>
+
+            <h2>Grade Report</h2>
+            <table id="gradeTable">
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Quiz</th>
+                        <th>Score</th>
+                    </tr>
+                </thead>
+                <tbody id="gradeList"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Global storage
+        let classrooms = [];
+        let students = [];
+        let quizzes = [];
+        let grades = [];
+
+        // Show/Hide Sections
+        function showSection(sectionId) {
+            // Hide all sections
+            ['dashboard', 'classrooms', 'students', 'quizzes', 'grades'].forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.remove('hidden');
+            
+            // Update dropdowns when switching sections
+            if (sectionId === 'students') updateClassroomDropdown();
+            if (sectionId === 'quizzes') updateClassroomDropdown();
+            if (sectionId === 'grades') {
+                updateStudentDropdown();
+                updateQuizDropdown();
+            }
+        }
+
+        // Classroom Management
+        document.getElementById('classroomForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('classroomName').value;
+            const subject = document.getElementById('classroomSubject').value;
+            
+            const classroom = { id: Date.now(), name, subject };
+            classrooms.push(classroom);
+            
+            renderClassrooms();
+            updateDashboard();
+            
+            // Clear form
+            document.getElementById('classroomName').value = '';
+            document.getElementById('classroomSubject').value = '';
+        });
+
+        function renderClassrooms() {
+            const list = document.getElementById('classroomList');
+            list.innerHTML = '';
+            
+            classrooms.forEach(classroom => {
+                const row = list.insertRow();
+                row.innerHTML = `
+                    <td>${classroom.name}</td>
+                    <td>${classroom.subject}</td>
+                    <td>
+                        <button onclick="deleteClassroom(${classroom.id})">Delete</button>
+                    </td>
+                `;
+            });
+        }
+
+        function deleteClassroom(id) {
+            classrooms = classrooms.filter(c => c.id !== id);
+            renderClassrooms();
+            updateDashboard();
+        }
+
+        // Student Management
+        function updateClassroomDropdown() {
+            const dropdowns = [
+                document.getElementById('studentClassroom'),
+                document.getElementById('quizClassroom')
+            ];
+            
+            dropdowns.forEach(dropdown => {
+                dropdown.innerHTML = '<option value="">Select Classroom</option>';
+                classrooms.forEach(classroom => {
+                    const option = document.createElement('option');
+                    option.value = classroom.id;
+                    option.textContent = classroom.name;
+                    dropdown.appendChild(option);
+                });
+            });
+        }
+
+        document.getElementById('studentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('studentName').value;
+            const classroomId = document.getElementById('studentClassroom').value;
+            
+            const student = { 
+                id: Date.now(), 
+                name, 
+                classroomId 
+            };
+            students.push(student);
+            
+            renderStudents();
+            updateDashboard();
+            
+            // Clear form
+            document.getElementById('studentName').value = '';
+            document.getElementById('studentClassroom').value = '';
+        });
+
+        function renderStudents() {
+            const list = document.getElementById('studentList');
+            list.innerHTML = '';
+            
+            students.forEach(student => {
+                const classroom = classrooms.find(c => c.id == student.classroomId);
+                const row = list.insertRow();
+                row.innerHTML = `
+                    <td>${student.name}</td>
+                    <td>${classroom ? classroom.name : 'Unassigned'}</td>
+                    <td>
+                        <button onclick="deleteStudent(${student.id})">Delete</button>
+                    </td>
+                `;
+            });
+        }
+
+        function deleteStudent(id) {
+            students = students.filter(s => s.id !== id);
+            renderStudents();
+            updateDashboard();
+        }
+
+        // Quiz Management
+        document.getElementById('quizForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const title = document.getElementById('quizTitle').value;
+            const classroomId = document.getElementById('quizClassroom').value;
+            const timeLimit = document.getElementById('quizTimeLimit').value;
+            
+            const quiz = { 
+                id: Date.now(), 
+                title, 
+                classroomId,
+                timeLimit: timeLimit || 'No Limit'
+            };
+            quizzes.push(quiz);
+            
+            renderQuizzes();
+            updateDashboard();
+            
+            // Clear form
+            document.getElementById('quizTitle').value = '';
+            document.getElementById('quizClassroom').value = '';
+            document.getElementById('quizTimeLimit').value = '';
+        });
+
+        function renderQuizzes() {
+            const list = document.getElementById('quizList');
+            list.innerHTML = '';
+            
+            quizzes.forEach(quiz => {
+                const classroom = classrooms.find(c => c.id == quiz.classroomId);
+                const row = list.insertRow();
+                row.innerHTML = `
+                    <td>${quiz.title}</td>
+                    <td>${classroom ? classroom.name : 'Unassigned'}</td>
+                    <td>${quiz.timeLimit}</td>
+                    <td>
+                        <button onclick="deleteQuiz(${quiz.id})">Delete</button>
+                    </td>
+                `;
+            });
+        }
+
+        function deleteQuiz(id) {
+            quizzes = quizzes.filter(q => q.id !== id);
+            renderQuizzes();
+            updateDashboard();
+        }
+
+        // Grade Management
+        function updateStudentDropdown() {
+            const dropdown = document.getElementById('gradeStudent');
+            dropdown.innerHTML = '<option value="">Select Student</option>';
+            students.forEach(student => {
+                const option = document.createElement('option');
+                option.value = student.id;
+                option.textContent = student.name;
+                dropdown.appendChild(option);
+            });
+        }
+
+        function updateQuizDropdown() {
+            const dropdown = document.getElementById('gradeQuiz');
+            dropdown.innerHTML = '<option value="">Select Quiz</option>';
+            quizzes.forEach(quiz => {
+                const option = document.createElement('option');
+                option.value = quiz.id;
+                option.textContent = quiz.title;
+                dropdown.appendChild(option);
+            });
+        }
+
+        document.getElementById('gradeForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const studentId = document.getElementById('gradeStudent').value;
+            const quizId = document.getElementById('gradeQuiz').value;
+            const score = document.getElementById('gradeScore').value;
+            
+            const grade = { 
+                id: Date.now(), 
+                studentId, 
+                quizId, 
+                score 
+            };
+            grades.push(grade);
+            
+            renderGrades();
+            
+            // Clear form
+            document.getElementById('gradeStudent').value = '';
+            document.getElementById('gradeQuiz').value = '';
+            document.getElementById('gradeScore').value = '';
+        });
+
+        function renderGrades() {
+            const list = document.getElementById('gradeList');
+            list.innerHTML = '';
+            
+            grades.forEach(grade => {
+                const student = students.find(s => s.id == grade.studentId);
+                const quiz = quizzes.find(q => q.id == grade.quizId);
+                
+                const row = list.insertRow();
+                row.innerHTML = `
+                    <td>${student ? student.name : 'Unknown'}</td>
+                    <td>${quiz ? quiz.title : 'Unknown'}</td>
+                    <td>${grade.score}</td>
+                `;
+            });
+        }
+
+        // Dashboard Update
+        function updateDashboard() {
+            document.getElementById('totalClassrooms').textContent = classrooms.length;
+            document.getElementById('totalStudents').textContent = students.length;
+            document.getElementById('totalQuizzes').textContent = quizzes.length;
+        }
+
+        // Initial setup
+        showSection('dashboard');
+    </script>
+</body>
+</html>
