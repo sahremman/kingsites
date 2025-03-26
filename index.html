@@ -3,187 +3,160 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ClassHub - Classroom Management</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Classroom Management</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div id="root"></div>
-
-    <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
-    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
-
-    <script type="text/babel">
-        // Main App Component
-        const App = () => {
-            const [page, setPage] = React.useState('dashboard');
-            const [classes, setClasses] = React.useState([
-                { id: 1, name: 'Environmental Soil Chemistry', students: [] },
-                { id: 2, name: 'Sustainable Development', students: [] }
-            ]);
-            const [selectedClass, setSelectedClass] = React.useState(null);
-
-            const Navigation = () => (
-                <nav className="bg-green-600 text-white p-4 flex justify-between">
-                    <div className="flex space-x-4">
-                        <button onClick={() => setPage('dashboard')} className="hover:bg-green-700 px-3 py-2 rounded">Dashboard</button>
-                        <button onClick={() => setPage('classes')} className="hover:bg-green-700 px-3 py-2 rounded">My Classes</button>
-                        <button onClick={() => setPage('students')} className="hover:bg-green-700 px-3 py-2 rounded">Students</button>
-                        <button onClick={() => setPage('assignments')} className="hover:bg-green-700 px-3 py-2 rounded">Assignments</button>
-                        <button onClick={() => setPage('profile')} className="hover:bg-green-700 px-3 py-2 rounded">Profile</button>
-                    </div>
-                </nav>
-            );
-
-            const Dashboard = () => (
-                <div className="p-6">
-                    <h1 className="text-3xl font-bold mb-4">Dashboard</h1>
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="bg-white shadow rounded p-4">
-                            <h2 className="text-xl font-semibold">Total Classes</h2>
-                            <p className="text-3xl">{classes.length}</p>
-                        </div>
-                        <div className="bg-white shadow rounded p-4">
-                            <h2 className="text-xl font-semibold">Total Students</h2>
-                            <p className="text-3xl">{classes.reduce((total, cls) => total + cls.students.length, 0)}</p>
-                        </div>
-                    </div>
-                </div>
-            );
-
-            const ClassList = () => {
-                const [newClassName, setNewClassName] = React.useState('');
-
-                const addClass = () => {
-                    if (newClassName.trim()) {
-                        setClasses([...classes, { 
-                            id: classes.length + 1, 
-                            name: newClassName, 
-                            students: [] 
-                        }]);
-                        setNewClassName('');
-                    }
-                };
-
-                return (
-                    <div className="p-6">
-                        <h1 className="text-3xl font-bold mb-4">My Classes</h1>
-                        <div className="flex mb-4">
-                            <input 
-                                type="text" 
-                                value={newClassName}
-                                onChange={(e) => setNewClassName(e.target.value)}
-                                placeholder="Enter new class name" 
-                                className="border p-2 mr-2 flex-grow"
-                            />
-                            <button 
-                                onClick={addClass} 
-                                className="bg-green-600 text-white px-4 py-2 rounded"
-                            >
-                                Add Class
-                            </button>
-                        </div>
-                        <div className="grid gap-4">
-                            {classes.map(cls => (
-                                <div key={cls.id} className="bg-white shadow rounded p-4 flex justify-between items-center">
-                                    <div>
-                                        <h2 className="text-xl font-semibold">{cls.name}</h2>
-                                        <p>{cls.students.length} students</p>
-                                    </div>
-                                    <button 
-                                        onClick={() => {
-                                            setSelectedClass(cls);
-                                            setPage('classDetails');
-                                        }} 
-                                        className="bg-blue-500 text-white px-3 py-2 rounded"
-                                    >
-                                        Manage
-                                    </button>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                );
-            };
-
-            const ClassDetails = () => {
-                const [studentName, setStudentName] = React.useState('');
-                const [studentEmail, setStudentEmail] = React.useState('');
-
-                const addStudent = () => {
-                    if (studentName.trim() && studentEmail.trim()) {
-                        const updatedClasses = classes.map(cls => 
-                            cls.id === selectedClass.id 
-                                ? {...cls, students: [...cls.students, { name: studentName, email: studentEmail }]}
-                                : cls
-                        );
-                        setClasses(updatedClasses);
-                        setStudentName('');
-                        setStudentEmail('');
-                    }
-                };
-
-                return (
-                    <div className="p-6">
-                        <h1 className="text-3xl font-bold mb-4">{selectedClass.name}</h1>
-                        <div className="grid md:grid-cols-2 gap-4">
-                            <div>
-                                <h2 className="text-xl font-semibold mb-2">Add Student</h2>
-                                <input 
-                                    type="text" 
-                                    value={studentName}
-                                    onChange={(e) => setStudentName(e.target.value)}
-                                    placeholder="Student Name" 
-                                    className="border p-2 w-full mb-2"
-                                />
-                                <input 
-                                    type="email" 
-                                    value={studentEmail}
-                                    onChange={(e) => setStudentEmail(e.target.value)}
-                                    placeholder="Student Email" 
-                                    className="border p-2 w-full mb-2"
-                                />
-                                <button 
-                                    onClick={addStudent} 
-                                    className="bg-green-600 text-white px-4 py-2 rounded w-full"
-                                >
-                                    Add Student
-                                </button>
-                            </div>
-                            <div>
-                                <h2 className="text-xl font-semibold mb-2">Students</h2>
-                                <div className="bg-white shadow rounded p-4">
-                                    {selectedClass.students.map((student, index) => (
-                                        <div key={index} className="border-b last:border-b-0 py-2">
-                                            <p className="font-medium">{student.name}</p>
-                                            <p className="text-gray-600">{student.email}</p>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                );
-            };
-
-            const renderPage = () => {
-                switch(page) {
-                    case 'dashboard': return <Dashboard />;
-                    case 'classes': return <ClassList />;
-                    case 'classDetails': return <ClassDetails />;
-                    default: return <Dashboard />;
-                }
-            };
-
-            return (
-                <div className="bg-gray-100 min-h-screen">
-                    <Navigation />
-                    {renderPage()}
-                </div>
-            );
-        };
-
-        ReactDOM.render(<App />, document.getElementById('root'));
-    </script>
+    <nav>
+        <ul>
+            <li><a href="index.html">Dashboard</a></li>
+            <li><a href="classes.html">Classes</a></li>
+            <li><a href="students.html">Students</a></li>
+            <li><a href="quizzes.html">Quizzes</a></li>
+            <li><a href="results.html">Results</a></li>
+        </ul>
+    </nav>
+    
+    <main>
+        <h1>Welcome to Classroom Management</h1>
+        <p>Select an option from the navigation menu.</p>
+    </main>
 </body>
 </html>
+
+<!-- students.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Students</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="index.html">Dashboard</a></li>
+            <li><a href="classes.html">Classes</a></li>
+            <li><a href="students.html">Students</a></li>
+            <li><a href="quizzes.html">Quizzes</a></li>
+            <li><a href="results.html">Results</a></li>
+        </ul>
+    </nav>
+    <main>
+        <h1>Manage Students</h1>
+        <form id="add-student-form">
+            <input type="text" id="student-name" placeholder="Student Name" required>
+            <input type="text" id="student-class" placeholder="Class" required>
+            <input type="email" id="student-email" placeholder="Email" required>
+            <button type="submit">Add Student</button>
+        </form>
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>Class</th>
+                <th>Email</th>
+                <th>Actions</th>
+            </tr>
+            <tbody id="student-list"></tbody>
+        </table>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>
+
+<!-- quizzes.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Quizzes</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="index.html">Dashboard</a></li>
+            <li><a href="classes.html">Classes</a></li>
+            <li><a href="students.html">Students</a></li>
+            <li><a href="quizzes.html">Quizzes</a></li>
+            <li><a href="results.html">Results</a></li>
+        </ul>
+    </nav>
+    <main>
+        <h1>Manage Quizzes</h1>
+        <form id="add-quiz-form">
+            <input type="text" id="quiz-title" placeholder="Quiz Title" required>
+            <textarea id="quiz-questions" placeholder="Enter questions (one per line)" required></textarea>
+            <input type="number" id="quiz-time" placeholder="Time Limit (mins)" required>
+            <button type="submit">Add Quiz</button>
+        </form>
+        <table>
+            <tr>
+                <th>Title</th>
+                <th>Time Limit</th>
+                <th>Actions</th>
+            </tr>
+            <tbody id="quiz-list"></tbody>
+        </table>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>
+
+<!-- results.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Results</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="index.html">Dashboard</a></li>
+            <li><a href="classes.html">Classes</a></li>
+            <li><a href="students.html">Students</a></li>
+            <li><a href="quizzes.html">Quizzes</a></li>
+            <li><a href="results.html">Results</a></li>
+        </ul>
+    </nav>
+    <main>
+        <h1>Quiz Results</h1>
+        <table>
+            <tr>
+                <th>Student Name</th>
+                <th>Quiz Title</th>
+                <th>Score</th>
+                <th>Actions</th>
+            </tr>
+            <tbody id="results-list"></tbody>
+        </table>
+        <button onclick="exportToCSV()">Download CSV</button>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>
+
+<!-- Updated script.js for new functionalities -->
+document.getElementById("add-student-form").addEventListener("submit", function(event) {
+    event.preventDefault();
+    const name = document.getElementById("student-name").value;
+    const className = document.getElementById("student-class").value;
+    const email = document.getElementById("student-email").value;
+    const studentList = document.getElementById("student-list");
+    const newRow = document.createElement("tr");
+    newRow.innerHTML = `<td>${name}</td><td>${className}</td><td>${email}</td><td><button onclick="deleteStudent(this)">Delete</button></td>`;
+    studentList.appendChild(newRow);
+});
+
+function deleteStudent(button) {
+    button.parentElement.parentElement.remove();
+}
+
+function exportToCSV() {
+    alert("Export to CSV functionality to be implemented.");
+}
