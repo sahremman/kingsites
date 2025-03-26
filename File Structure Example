@@ -1,15 +1,20 @@
-/classroom-manager  
-  |-- index.html  
-  |-- classrooms.html  
-  |-- students.html  
-  |-- quizzes.html  
-  |-- grades.html  
-  |-- /css  
-       |-- style.css  
-  |-- /js  
-       |-- main.js  
-       |-- classrooms.js  
-       |-- students.js  
-       |-- quizzes.js  
-       |-- grades.js  
-  |-- README.md  
+classroom-management-app/
+│
+├── frontend/
+│   ├── public/
+│   ├── src/
+│   │   ├── components/
+│   │   ├── pages/
+│   │   ├── services/
+│   │   ├── utils/
+│   │   └── App.js
+│   └── package.json
+│
+├── backend/
+│   ├── models/
+│   ├── controllers/
+│   ├── routes/
+│   ├── middleware/
+│   └── server.js
+│
+└── README.md
